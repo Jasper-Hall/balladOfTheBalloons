@@ -71,10 +71,36 @@ canvas {
     border: 1px solid rgba(46, 59, 107, 0.25);
     border-radius: 8px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px; /* prevent overlap on narrower embeds */
     z-index: 20;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 #statusIndicator::after { display: none; }
+
+/* Responsive sizing for compact contexts (mobile/iframes) */
+@media (max-width: 900px) {
+  #statusIndicator {
+    font-size: 11px;
+    padding: 4px 8px;
+    max-width: 200px;
+    right: 8px;
+    top: 8px;
+  }
+}
+@media (max-width: 600px) {
+  #statusIndicator {
+    font-size: 10px;
+    padding: 3px 6px;
+    max-width: 130px;
+    right: 6px;
+    top: 6px;
+  }
+}
+@media (max-width: 420px) {
+  #statusIndicator { display: none; }
+}
 
 @keyframes ellipsis {
     0% { content: ''; }
