@@ -464,47 +464,32 @@ function setup() {
     // setInterval(updateLoadingStatus, 60000); // Removed periodic update
 }
 
-function drawLoadingChip(message) {
-  push();
-  const chipPaddingX = 14;
-  const chipPaddingY = 6;
-  textAlign(CENTER, CENTER);
-  textSize(14);
-  const textW = textWidth(message);
-  const chipW = textW + chipPaddingX * 2;
-  const chipH = 30;
-  const cx = width / 2;
-  const cy = height / 2;
-
-  // Chip background
-  noStroke();
-  fill(255, 255, 255, 235);
-  rectMode(CENTER);
-  drawingContext.shadowColor = 'rgba(0,0,0,0.14)';
-  drawingContext.shadowBlur = 10;
-  drawingContext.shadowOffsetY = 2;
-  rect(cx, cy, chipW, chipH, 8);
-
-  // Text
-  fill(34);
-  drawingContext.shadowBlur = 0;
-  text(message, cx, cy + 1);
-  pop();
+function showCanvasLoading(message) {
+  const overlay = document.getElementById('canvasLoadingOverlay');
+  if (!overlay) return;
+  overlay.textContent = message || 'Loading…';
+  overlay.style.display = 'flex';
+}
+function hideCanvasLoading() {
+  const overlay = document.getElementById('canvasLoadingOverlay');
+  if (!overlay) return;
+  overlay.style.display = 'none';
 }
 
 function draw() {
     if (!audioBuffer) {
       background(255);
-      drawLoadingChip('Loading audio…');
+      showCanvasLoading('Loading audio…');
       return;
     }
   
     if (!dataLoaded || sortedTimestamps.length === 0) {
       background(255);
-      drawLoadingChip('Loading data…');
+      showCanvasLoading('Loading data…');
       return;
     }
-  
+
+    hideCanvasLoading();
     background(255);  
   
     drawMap();
