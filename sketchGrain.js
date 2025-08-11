@@ -15,6 +15,8 @@ let dataLoaded = false;
 let apiDataLoaded = false;
 let apiLoadTime = '';
 let timeLabels = [];
+let statusHideTimeout = null; // handle to hide the status badge after load
+let statusShownAfterLoad = false; // ensure we only show once per fetch cycle
 // Removed devMode flag
 
 let gridSize = 40;
@@ -258,7 +260,9 @@ async function loadInitialData() {
   async function fetchRadiosondeData() {
     try {
         apiDataLoaded = false;
-        loadingStatus = "loading data..."
+        statusShownAfterLoad = false; // reset per cycle
+        showLoading();
+        loadingStatus = "loading data...";
         
         // If in dev mode, use local data only
         if (false) { // Removed devMode check
@@ -273,6 +277,7 @@ async function loadInitialData() {
                 apiDataLoaded = true;
                 apiLoadTime = Date.now();
                 updateLoadingStatus();
+                if (!statusShownAfterLoad) { showLoadedBriefly(); statusShownAfterLoad = true; }
                 setupTimeMarkers();
                 return;
             } else {
@@ -344,6 +349,7 @@ async function loadInitialData() {
         // Store apiLoadTime as a timestamp
         apiLoadTime = Date.now(); 
         updateLoadingStatus();
+        if (!statusShownAfterLoad) { showLoadedBriefly(); statusShownAfterLoad = true; }
 
         // **Call setupTimeMarkers to update balloon positions**
         setupTimeMarkers();
@@ -364,6 +370,7 @@ async function loadInitialData() {
                 apiDataLoaded = true;
                 apiLoadTime = Date.now();
                 updateLoadingStatus();
+                if (!statusShownAfterLoad) { showLoadedBriefly(); statusShownAfterLoad = true; }
                 setupTimeMarkers();
             }
         } catch (localError) {
@@ -373,20 +380,14 @@ async function loadInitialData() {
 }
 
   function updateLoadingStatus() {
-    const statusIndicator = document.getElementById('statusIndicator');
-    if (!statusIndicator) return;
+  const statusIndicator = document.getElementById('statusIndicator');
+  if (!statusIndicator) return;
 
-    if (!dataLoaded) {
-        loadingStatus = "Loading most recent data";
-    } else if (!apiDataLoaded) {
-        loadingStatus = "Loading most recent data";
-    } else {
-        const nextUpdateTime = apiLoadTime + fetchInterval;
-        const timeUntilNextUpdate = Math.max(0, Math.floor((nextUpdateTime - Date.now()) / 60000));
-        loadingStatus = `Data loaded, updating in ${timeUntilNextUpdate} mins`;
-    }
-
-    statusIndicator.textContent = loadingStatus;
+  if (!dataLoaded || !apiDataLoaded) {
+      setStatus('Loading most recent data');
+  } else {
+      setStatus('Data loaded');
+  }
 }
   
   function populateTimestampsFromRadiosondes() {
@@ -445,7 +446,7 @@ function setup() {
     context = getAudioContext(); 
     loadInitialData().then(() => {
         fetchRadiosondeData();
-        setInterval(fetchRadiosondeData, fetchInterval); 
+        // setInterval(fetchRadiosondeData, fetchInterval); // Removed periodic fetch
     });
   
     timeSlider = select('#slider');
@@ -460,30 +461,52 @@ function setup() {
     maxRelease = 1.2;
 
     // Update loading status every minute
-    setInterval(updateLoadingStatus, 60000);
+    // setInterval(updateLoadingStatus, 60000); // Removed periodic update
+}
+
+function drawLoadingChip(message) {
+  push();
+  const chipPaddingX = 14;
+  const chipPaddingY = 6;
+  textAlign(CENTER, CENTER);
+  textSize(14);
+  const textW = textWidth(message);
+  const chipW = textW + chipPaddingX * 2;
+  const chipH = 30;
+  const cx = width / 2;
+  const cy = height / 2;
+
+  // Chip background
+  noStroke();
+  fill(255, 255, 255, 235);
+  rectMode(CENTER);
+  drawingContext.shadowColor = 'rgba(0,0,0,0.14)';
+  drawingContext.shadowBlur = 10;
+  drawingContext.shadowOffsetY = 2;
+  rect(cx, cy, chipW, chipH, 8);
+
+  // Text
+  fill(34);
+  drawingContext.shadowBlur = 0;
+  text(message, cx, cy + 1);
+  pop();
 }
 
 function draw() {
     if (!audioBuffer) {
       background(255);
-      fill(100);
-      textAlign(CENTER, CENTER);
-      textSize(24);
-      text('Loading audio...', width / 2, height / 2);
+      drawLoadingChip('Loading audio…');
       return;
     }
   
     if (!dataLoaded || sortedTimestamps.length === 0) {
       background(255);
-      fill(100);
-      textAlign(CENTER, CENTER);
-      textSize(24);
-      text('Loading data...', width / 2, height / 2);
+      drawLoadingChip('Loading data…');
       return;
     }
-
+  
     background(255);  
-
+  
     drawMap();
   
     let currentSliderValue = timeSlider.value();
@@ -1010,4 +1033,25 @@ function formatDateTime(timestamp) {
         minute: '2-digit' 
     }); // e.g., "Sep 14, 2023, 02:00 PM"
 }
+
+function setStatus(text) {
+  const el = document.getElementById('statusIndicator');
+  if (!el) return;
+  if (text && text.trim().length > 0) {
+    el.style.display = 'flex';
+    el.textContent = text;
+  } else {
+    el.style.display = 'none';
+    el.textContent = '';
+  }
+}
+
+function showLoadedBriefly() {
+  // Clear any existing hide timers
+  if (statusHideTimeout) clearTimeout(statusHideTimeout);
+  setStatus('Data loaded');
+  statusHideTimeout = setTimeout(() => setStatus(''), 1800);
+}
+
+function showLoading() { setStatus('Loading most recent data'); }
 

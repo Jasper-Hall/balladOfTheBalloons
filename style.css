@@ -35,6 +35,7 @@ body {
     position: relative;
     overflow: hidden;
     border-radius: 10px;
+    margin-top: 12px; /* subtle padding under the controls */
 }
 
 canvas {
@@ -59,63 +60,48 @@ canvas {
     margin-top: 10px;
 }
 
-/* Status indicator - match top button style */
+/* Status indicator - right aligned, same visual chrome as controls */
 #statusIndicator {
     position: absolute;
     top: 10px;
-    right: 10px;
+    right: 28px; /* align with sketch-holder right edge (container inner padding) */
+    left: auto;
     font-size: 12px;
-    padding: 6px 10px;
+    padding: 0 10px; /* height will be synced to .top-buttons */
     background: rgba(255,255,255,0.85);
     color: #222;
     border: 1px solid rgba(46, 59, 107, 0.25);
     border-radius: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 280px; /* prevent overlap on narrower embeds */
+    white-space: nowrap; /* no wrapping */
     z-index: 20;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: none; /* hidden until we have text */
+    align-items: center; /* vertically center when shown as flex */
+    height: var(--control-height);
 }
 #statusIndicator::after { display: none; }
 
-/* Responsive sizing for compact contexts (mobile/iframes) */
+/* Hide status on small mobile sizes */
+@media (max-width: 600px) { #statusIndicator { display: none !important; } }
+
+/* Responsive spacing for compact contexts (mobile/iframes) */
 @media (max-width: 900px) {
   #statusIndicator {
     font-size: 11px;
-    padding: 4px 8px;
-    max-width: 200px;
-    right: 8px;
+    right: 28px;
     top: 8px;
   }
 }
 @media (max-width: 600px) {
   #statusIndicator {
     font-size: 10px;
-    padding: 3px 6px;
-    max-width: 130px;
-    right: 6px;
+    right: 28px;
     top: 6px;
   }
 }
-@media (max-width: 420px) {
-  #statusIndicator { display: none; }
-}
 
-@keyframes ellipsis {
-    0% { content: ''; }
-    33% { content: '.'; }
-    66% { content: '..'; }
-    100% { content: '...'; }
-}
-
-#statusIndicator::after {
-    content: '.';
-    display: inline-block;
-    animation: ellipsis 1.5s infinite;
-    width: 1em;
-    text-align: left;
-}
+/* Remove legacy ellipsis animation rules */
+/* (intentionally left blank; previous @keyframes/::after were removed) */
 
 #timeLabels {
     display: flex;
@@ -167,14 +153,37 @@ canvas {
     position: absolute;
     top: 10px;
     left: 28px; /* align with container padding */
-    display: flex;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: auto auto minmax(160px, 1fr) auto; /* play | loop | slider | info */
     align-items: center;
+    gap: 12px;
     background: rgba(255,255,255,0.85);
     border: 1px solid rgba(46, 59, 107, 0.25);
     padding: 6px 10px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    max-width: calc(100% - 56px); /* respect container padding */
+    height: var(--control-height);
+}
+
+/* Slider should flex */
+.top-buttons input[type="range"] {
+    width: 100%;
+    min-width: 120px;
+}
+
+/* Stack the slider on its own row on narrow viewports */
+@media (max-width: 560px) {
+  .top-buttons {
+    grid-template-columns: auto auto auto; /* buttons on first row */
+    gap: 8px;
+    padding: 6px 8px;
+  }
+  .top-buttons input[type="range"] {
+    grid-column: 1 / -1; /* full width row */
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 .bottom-buttons {
@@ -212,3 +221,6 @@ input[type="range"] { accent-color: #2e3b6b; }
 .balloon-icon { position: absolute; transform: translate(-50%, -100%); font-size: 17px; pointer-events: none; z-index: 3; opacity: 0; transition: opacity 0.5s ease-in-out; }
 .balloon-icon.visible { opacity: 1; animation: floatUpDown 2s ease-in-out infinite; }
 @keyframes floatUpDown { 0% { transform: translate(-50%, calc(-100% + 9px)); } 50% { transform: translate(-50%, calc(-100% - 0px)); } 100% { transform: translate(-50%, calc(-100% + 9px)); } }
+
+/* Shared control height for alignment */
+:root { --control-height: 32px; }
