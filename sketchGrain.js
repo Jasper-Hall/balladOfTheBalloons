@@ -505,13 +505,13 @@ function drawLoadingChip(message) {
 function draw() {
     if (!audioBuffer) {
       background(255);
-      drawLoadingChip('Loading audio…');
+      drawLoadingChip('Loading audio');
       return;
     }
   
     if (!dataLoaded || sortedTimestamps.length === 0) {
       background(255);
-      drawLoadingChip('Fetching data…');
+      drawLoadingChip('Fetching data');
       return;
     }
   
