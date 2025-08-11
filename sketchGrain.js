@@ -384,7 +384,7 @@ async function loadInitialData() {
   if (!statusIndicator) return;
 
   if (!dataLoaded || !apiDataLoaded) {
-      setStatus('Loading most recent data');
+      setStatus('Fetching data');
   } else {
       setStatus('Data loaded');
   }
@@ -1053,5 +1053,5 @@ function showLoadedBriefly() {
   statusHideTimeout = setTimeout(() => setStatus(''), 1800);
 }
 
-function showLoading() { setStatus('Loading most recent data'); }
+function showLoading() { setStatus('Fetching data'); }
 
