@@ -464,32 +464,57 @@ function setup() {
     // setInterval(updateLoadingStatus, 60000); // Removed periodic update
 }
 
-function showCanvasLoading(message) {
-  const overlay = document.getElementById('canvasLoadingOverlay');
-  if (!overlay) return;
-  overlay.textContent = message || 'Loading…';
-  overlay.style.display = 'flex';
-}
-function hideCanvasLoading() {
-  const overlay = document.getElementById('canvasLoadingOverlay');
-  if (!overlay) return;
-  overlay.style.display = 'none';
+function drawLoadingChip(message) {
+  push();
+  
+  // Set font to match the UI
+  textFont('IBM Plex Sans, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif');
+  textAlign(CENTER, CENTER);
+  textSize(13);
+  
+  const chipPaddingX = 16;
+  const chipPaddingY = 8;
+  const textW = textWidth(message);
+  const chipW = textW + chipPaddingX * 2;
+  const chipH = 32;
+  const cx = width / 2;
+  const cy = height / 2;
+
+  // Chip background with subtle styling
+  noStroke();
+  fill(255, 255, 255, 250);
+  rectMode(CENTER);
+  
+  // Add shadow
+  drawingContext.shadowColor = 'rgba(0,0,0,0.12)';
+  drawingContext.shadowBlur = 8;
+  drawingContext.shadowOffsetY = 2;
+  rect(cx, cy, chipW, chipH, 10);
+
+  // Reset shadow for text
+  drawingContext.shadowBlur = 0;
+  drawingContext.shadowOffsetY = 0;
+  
+  // Text styling
+  fill(60, 60, 60);
+  text(message, cx, cy);
+  
+  pop();
 }
 
 function draw() {
     if (!audioBuffer) {
       background(255);
-      showCanvasLoading('Loading audio…');
+      drawLoadingChip('Loading audio…');
       return;
     }
   
     if (!dataLoaded || sortedTimestamps.length === 0) {
       background(255);
-      showCanvasLoading('Loading data…');
+      drawLoadingChip('Fetching data…');
       return;
     }
-
-    hideCanvasLoading();
+  
     background(255);  
   
     drawMap();
