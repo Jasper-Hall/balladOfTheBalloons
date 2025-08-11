@@ -438,6 +438,15 @@ function soundLoaded() {
 
 function setup() {
     const holderEl = document.getElementById('sketch-holder');
+    // Remove any default p5 loading paragraph if present
+    const strayLoaders = holderEl?.querySelectorAll('p');
+    if (strayLoaders && strayLoaders.length > 0) {
+        strayLoaders.forEach(el => {
+            if (el && /loading/i.test(el.textContent || '')) {
+                try { el.remove(); } catch (_) { el.style.display = 'none'; }
+            }
+        });
+    }
     const holderRect = holderEl.getBoundingClientRect();
     let canvas = createCanvas(Math.max(100, holderRect.width), Math.max(100, holderRect.height));
     canvas.parent('sketch-holder');

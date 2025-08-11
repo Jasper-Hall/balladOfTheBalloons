@@ -46,6 +46,11 @@ canvas {
 #sketch-holder p {
     display: none !important;
 }
+/* p5 adds a global loader element; hide it explicitly */
+#p5_loading,
+.p5_loading {
+    display: none !important;
+}
 
 /* Popups */
 .popup {
