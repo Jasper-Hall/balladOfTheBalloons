@@ -1,0 +1,25 @@
+{
+  "name": "ballad-of-the-balloons",
+  "version": "1.0.0",
+  "description": "An interactive audio-visual experience using weather balloon data and granular synthesis",
+  "main": "index.html",
+  "scripts": {
+    "dev": "live-server --port=3000 --open=/",
+    "start": "live-server --port=3000 --open=/",
+    "build": "echo 'Static site - no build step needed'",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "p5js",
+    "creative-coding",
+    "weather-balloons",
+    "granular-synthesis",
+    "web-audio",
+    "data-visualization"
+  ],
+  "author": "Jasper Hall",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
